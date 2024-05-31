@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 //#define LOG_USE_NO_COLOR
 #define LOG_ENTRY_FILE "log_entry_table.h"
 #define LOG_USE_SHORT_NAMES_GLOBALLY

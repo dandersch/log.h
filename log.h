@@ -1,9 +1,5 @@
 #pragma once
 
-#include <time.h>
-
-extern int log_verbosity_level;
-
 #if !defined(LOG_ENTRY_FILE)
 
   #define LOG_ENTRIES_SEVERITY \
@@ -28,6 +24,15 @@ extern int log_verbosity_level;
     LOG_ENTRY_CATEGORY(EMPTY2,           0, "[     ]", LOG_COLOR_GRAY)
 
 #endif
+
+#include <stdio.h>
+#include <time.h>
+
+#if !defined(LOG_VARIABLE_NAME)
+  #define LOG_VARIABLE_NAME log_verbosity_level
+#endif
+
+extern int LOG_VARIABLE_NAME;
 
 #ifdef LOG_USE_NO_COLOR
   #define LOG_COLOR_OFF    ""
@@ -133,13 +138,13 @@ enum
 
 /* the core of the log macro */
 #define _LOG(Flags, Format, ...)                                                                  \
-  if ((Flags) & log_verbosity_level)                                                              \
+  if ((Flags) & LOG_VARIABLE_NAME)                                                                \
   {                                                                                               \
     /* get a timestamp string */                                                                  \
     time_t t = time(NULL); struct tm* time = localtime(&t);                                       \
     char buf[32]; buf[strftime(buf, sizeof(buf), LOG_TIME_FORMAT, time)] = '\0';                  \
     printf("%s" LOG_COLOR_OFF "%s%s%s %12.12s:%4i " Format LOG_COLOR_OFF"\n", buf,                \
-           LOG_PrioritiesLabel(Flags), LOG_SubsystemsLabel(Flags), _log_categories_label(Flags), \
+           _log_severity_label(Flags), _log_subsystem_label(Flags), _log_category_label(Flags), \
            __FILE__, __LINE__, ##__VA_ARGS__);                                                    \
   }
 
@@ -184,7 +189,7 @@ enum
 #define LOG_ENTRY_SEVERITY(name, value, string, color) case LOG_SEVERITY_##name: return color string LOG_COLOR_OFF;
 #define LOG_ENTRY_SUBSYSTEM(name, value, string, color)
 #define LOG_ENTRY_CATEGORY(name, value, string, color)
-static inline const char* LOG_PrioritiesLabel(int Flags)
+static inline const char* _log_severity_label(int Flags)
 {
   switch (Flags & LOG_SEVERITY)
   {
@@ -193,7 +198,7 @@ static inline const char* LOG_PrioritiesLabel(int Flags)
     #else
       LOG_ENTRIES_SEVERITY
     #endif
-    default:         return "ERROR: COMBINING LOG SEVERITIES NOT SUPPORTED";
+    default: return "ERROR: COMBINING LOG SEVERITIES NOT SUPPORTED";
   }
 }
 #undef LOG_ENTRY_SEVERITY
@@ -203,7 +208,7 @@ static inline const char* LOG_PrioritiesLabel(int Flags)
 #define LOG_ENTRY_SEVERITY(name, value, string, color)
 #define LOG_ENTRY_SUBSYSTEM(name, value, string, color) case LOG_SUBSYSTEM_##name: return color string LOG_COLOR_OFF;
 #define LOG_ENTRY_CATEGORY(name, value, string, color)
-static inline const char* LOG_SubsystemsLabel(int Flags)
+static inline const char* _log_subsystem_label(int Flags)
 {
   switch (Flags & LOG_SUBSYSTEMS)
   {
@@ -212,7 +217,7 @@ static inline const char* LOG_SubsystemsLabel(int Flags)
     #else
       LOG_ENTRIES_SUBSYSTEM
     #endif
-    default:         return "ERROR: COMBINING LOG SUBSYSTEMS NOT SUPPORTED";
+    default: return "ERROR: COMBINING LOG SUBSYSTEMS NOT SUPPORTED";
   }
 }
 #undef LOG_ENTRY_SEVERITY
@@ -222,16 +227,16 @@ static inline const char* LOG_SubsystemsLabel(int Flags)
 #define LOG_ENTRY_SEVERITY(name, value, string, color)
 #define LOG_ENTRY_SUBSYSTEM(name, value, string, color)
 #define LOG_ENTRY_CATEGORY(name, value, string, color) case LOG_CATEGORY_##name: return color string LOG_COLOR_OFF;
-static inline const char* _log_categories_label(int Flags)
+static inline const char* _log_category_label(int flags)
 {
-  switch (Flags & LOG_CATEGORIES)
+  switch (flags & LOG_CATEGORIES)
   {
     #ifdef LOG_ENTRY_FILE
       #include LOG_ENTRY_FILE
     #else
       LOG_ENTRIES_CATEGORY
     #endif
-    default:         return "ERROR: COMBINING LOG CATEGORIES NOT SUPPORTED";
+    default: return "ERROR: COMBINING LOG CATEGORIES NOT SUPPORTED";
   }
 }
 #undef LOG_ENTRY_SEVERITY
@@ -239,6 +244,6 @@ static inline const char* _log_categories_label(int Flags)
 #undef LOG_ENTRY_CATEGORY
 
 /* NOTE these #define's are used in the LOG macro, so we cannot keep them #undef'ed */
-#define LOG_ENTRY_SEVERITY(name, value, string, color) name = LOG_SEVERITY_##name ,
-#define LOG_ENTRY_SUBSYSTEM(name, value, string, color) name = LOG_SUBSYSTEM_##name ,
-#define LOG_ENTRY_CATEGORY(name, value, string, color) name = LOG_CATEGORY_##name ,
+#define LOG_ENTRY_SEVERITY(name, value, string, color)  name = LOG_SEVERITY_##name,
+#define LOG_ENTRY_SUBSYSTEM(name, value, string, color) name = LOG_SUBSYSTEM_##name,
+#define LOG_ENTRY_CATEGORY(name, value, string, color)  name = LOG_CATEGORY_##name,
