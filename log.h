@@ -1,3 +1,7 @@
+#pragma once
+
+#include <time.h>
+
 extern int log_verbosity_level;
 
 #if !defined(LOG_ENTRY_FILE)
@@ -120,12 +124,18 @@ enum
   LOG_EVERYTHING       = 0x7fffffff,
 };
 
+#if !defined(LOG_TIME_FORMAT)
+  #define LOG_TIME_FORMAT "%H:%M:%S "
+#endif
+
 /* the core of the log macro */
 #define _LOG(Flags, Format, ...)                                                                  \
   if ((Flags) & log_verbosity_level)                                                              \
   {                                                                                               \
-    printf("%s%s%s %12.12s:%4i " Format LOG_COLOR_OFF"\n",                                        \
-           LOG_PrioritiesLabel(Flags), LOG_SubsystemsLabel(Flags), LOG_SubcategoriesLabel(Flags), \
+    /* get a timestamp string */                                                                  \
+    time_t t = time(NULL); struct tm* time = localtime(&t);                                       \
+    char buf[32]; buf[strftime(buf, sizeof(buf), LOG_TIME_FORMAT, time)] = '\0';                  \
+    printf("%s" LOG_COLOR_OFF "%s%s%s %12.12s:%4i " Format LOG_COLOR_OFF"\n", buf,                \
            __FILE__, __LINE__, ##__VA_ARGS__);                                                    \
   }
 
