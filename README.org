@@ -76,3 +76,11 @@ However, this is more likely to cause name collisions, so beware.
 This is essentially an [[https://en.wikipedia.org/wiki/X_Macro][X-Macro]] version of the [[https://github.com/MetricPanda/loggen][loggen]] library, which eliminates
 the necessity of a code-generation step in your build script by relying on the C
 preprocessor instead (but is also less powerful because of this).
+
+* Limitations
+- Because the implementation is using a bitfield based on the entries in an
+  enum, the amount of log entries (i.e. the sum of severity levels, subsystems
+  and categories) *cannot be more than 32*.
+- If you are specifying your log entries in the header-file, you have to specify
+  its value (i.e. the bit that is set for it) yourself. If using a separate
+  file, you can use the ~__LINE__~ macro to do this job for you.
