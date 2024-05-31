@@ -1,0 +1,78 @@
+#+TITLE: log.h
+
+A single-header logging library that allows custom definitions of logging
+severities, subsystems and categories - either in a separate file or inside the
+header file.
+
+* Usage (File)
+#+BEGIN_SRC C :includes "./log.h"
+#define LOG_USE_COLOR // optional
+#include "log.h"
+
+int log_verbosity_level = LOG_EVERYTHING;
+
+int main()
+{
+    LOG(TRACE|PLATFORM|INIT,"Started engine");
+    LOG(INFO|VIDEO|INIT, "Successfully initialized video subsystem");
+    LOG(AUDIO|WARN|ACTIVATE, "Insufficient memory for normal-sized buffer");
+    LOG(FATAL|NETWORK|INIT,   "Couldn't init network. Aborting...");
+}
+#+END_SRC
+
+Output:
+#+BEGIN_SRC
+[TRACE][PLATF][INIT ]       main.c:  20 Started engine
+[INFO ][VIDEO][INIT ]       main.c:  21 Successfully initialized video subsystem
+[WARN ][AUDIO][ACTIV]       main.c:  22 Insufficient memory for normal-sized buffer
+[FATAL][NETWK][INIT ]       main.c:  23 Couldn't init network. Aborting...
+#+END_SRC
+
+* Using your own definitions in a separate file
+#+BEGIN_SRC C :includes "log.h"
+#define LOG_ENTRY_FILE "log_entry_table.h" // filename of your choice
+#include "log.h"
+#+END_SRC
+
+The ~log_entry_table.h~ header should follow the following structure:
+#+BEGIN_SRC C :includes "log.h"
+/* entry             name         value   string     color          */
+LOG_ENTRY_SEVERITY(  TRACE,      (1<<0),  "[TRACE]", LOG_COLOR_GRAY  )
+LOG_ENTRY_SEVERITY(  INFO,       (1<<1),  "[INFO ]", LOG_COLOR_GREEN )
+LOG_ENTRY_SEVERITY(  WARN,       (1<<2),  "[WARN ]", LOG_COLOR_YELLOW)
+LOG_ENTRY_SEVERITY(  ERROR,      (1<<3),  "[ERROR]", LOG_COLOR_RED   )
+LOG_ENTRY_SEVERITY(  FATAL,      (1<<4),  "[FATAL]", LOG_COLOR_PURPLE)
+
+LOG_ENTRY_SUBSYSTEM( PLATFORM,  (1<<5),  "[PLATF]", LOG_COLOR_YELLOW )
+LOG_ENTRY_SUBSYSTEM( AUDIO,     (1<<6),  "[AUDIO]", LOG_COLOR_YELLOW )
+LOG_ENTRY_SUBSYSTEM( VIDEO,     (1<<7),  "[VIDEO]", LOG_COLOR_YELLOW )
+LOG_ENTRY_SUBSYSTEM( NETWORK,   (1<<8),  "[NETWK]", LOG_COLOR_YELLOW )
+LOG_ENTRY_SUBSYSTEM( TEST,      (1<<9),  "[TEST ]", LOG_COLOR_YELLOW )
+
+LOG_ENTRY_CATEGORY(  INIT,       (1<<20), "[INIT ]", LOG_COLOR_PURPLE)
+LOG_ENTRY_CATEGORY(  SHUTDOWN,   (1<<21), "[SHUTD]", LOG_COLOR_OFF   )
+LOG_ENTRY_CATEGORY(  ACTIVATE,   (1<<22), "[ACTIV]", LOG_COLOR_PURPLE)
+LOG_ENTRY_CATEGORY(  DEACTIVATE, (1<<23), "[DEACT]", LOG_COLOR_PURPLE)
+#+END_SRC
+
+
+Having the logging definitions in a separate file eliminates the possibility of
+having shortened names in the ~LOG(..)~ macro like above (due to restrictions with
+the preprocessor). This mean you now have to write ~LOG(LOG_TRACE, "...")~ instead
+of ~LOG(TRACE, "...")~.
+
+Optionally, you can put the shortened versions in the global namespace by
+defining ~LOG_USE_SHORT_NAMES_GLOBALLY~ before including ~"log.h"~.
+
+#+BEGIN_SRC C :includes "log.h"
+#define LOG_ENTRY_FILE "log_entry_table.h"
+#define LOG_USE_SHORT_NAMES_GLOBALLY
+#include "log.h"
+#+END_SRC
+
+However, this is more likely to cause name collisions, so beware.
+
+* About
+This is essentially an [[https://en.wikipedia.org/wiki/X_Macro][X-Macro]] version of the [[https://github.com/MetricPanda/loggen][loggen]] library, which eliminates
+the necessity of a code-generation step in your build script by relying on the C
+preprocessor instead (but is also less powerful because of this).
