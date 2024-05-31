@@ -137,14 +137,14 @@ enum
 #endif
 
 /* the core of the log macro */
-#define _LOG(Flags, Format, ...)                                                                  \
-  if ((Flags) & LOG_VARIABLE_NAME)                                                                \
+#define _LOG(flags, format, ...)                                                                  \
+  if ((flags) & LOG_VARIABLE_NAME)                                                                \
   {                                                                                               \
     /* get a timestamp string */                                                                  \
     time_t t = time(NULL); struct tm* time = localtime(&t);                                       \
     char buf[32]; buf[strftime(buf, sizeof(buf), LOG_TIME_FORMAT, time)] = '\0';                  \
-    printf("%s" LOG_COLOR_OFF "%s%s%s %12.12s:%4i " Format LOG_COLOR_OFF"\n", buf,                \
-           _log_severity_label(Flags), _log_subsystem_label(Flags), _log_category_label(Flags), \
+    printf("%s" LOG_COLOR_OFF "%s%s%s %12.12s:%4i " format LOG_COLOR_OFF"\n", buf,                \
+           _log_severity_label(flags), _log_subsystem_label(flags), _log_category_label(flags), \
            __FILE__, __LINE__, ##__VA_ARGS__);                                                    \
   }
 
@@ -165,12 +165,12 @@ enum
 #define LOG_ENTRY_SUBSYSTEM(name, value, string, color) name = LOG_SUBSYSTEM_##name ,
 #define LOG_ENTRY_CATEGORY(name, value, string, color) name = LOG_CATEGORY_##name ,
 #if defined(LOG_ENTRY_FILE)
-  #define LOG(Flags, Format, ...)          \
+  #define LOG(flags, format, ...)          \
     {                                      \
-        _LOG(Flags, Format, ##__VA_ARGS__) \
+        _LOG(flags, format, ##__VA_ARGS__) \
     }
 #else
-  #define LOG(Flags, Format, ...)           \
+  #define LOG(flags, format, ...)           \
     {                                       \
         enum {                              \
         /* remove LOG_ prefix */            \
@@ -178,7 +178,7 @@ enum
         LOG_ENTRIES_SUBSYSTEM               \
         LOG_ENTRIES_CATEGORY                \
         };                                  \
-        _LOG(Flags, Format, ##__VA_ARGS__)  \
+        _LOG(flags, format, ##__VA_ARGS__)  \
     }
 #endif
 /* NOTE redefined to above #define at bottom of file */
@@ -189,9 +189,9 @@ enum
 #define LOG_ENTRY_SEVERITY(name, value, string, color) case LOG_SEVERITY_##name: return color string LOG_COLOR_OFF;
 #define LOG_ENTRY_SUBSYSTEM(name, value, string, color)
 #define LOG_ENTRY_CATEGORY(name, value, string, color)
-static inline const char* _log_severity_label(int Flags)
+static inline const char* _log_severity_label(int flags)
 {
-  switch (Flags & LOG_SEVERITY)
+  switch (flags & LOG_SEVERITY)
   {
     #ifdef LOG_ENTRY_FILE
       #include LOG_ENTRY_FILE
@@ -208,9 +208,9 @@ static inline const char* _log_severity_label(int Flags)
 #define LOG_ENTRY_SEVERITY(name, value, string, color)
 #define LOG_ENTRY_SUBSYSTEM(name, value, string, color) case LOG_SUBSYSTEM_##name: return color string LOG_COLOR_OFF;
 #define LOG_ENTRY_CATEGORY(name, value, string, color)
-static inline const char* _log_subsystem_label(int Flags)
+static inline const char* _log_subsystem_label(int flags)
 {
-  switch (Flags & LOG_SUBSYSTEMS)
+  switch (flags & LOG_SUBSYSTEMS)
   {
     #ifdef LOG_ENTRY_FILE
       #include LOG_ENTRY_FILE

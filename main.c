@@ -1,4 +1,3 @@
-//#define LOG_USE_NO_COLOR
 #define LOG_ENTRY_FILE "log_entry_table.h"
 #define LOG_USE_SHORT_NAMES_GLOBALLY
 #define LOG_TIME_FORMAT LOG_COLOR_GRAY "%H:%M:%S "
@@ -8,12 +7,9 @@ int log_verbosity_level = LOG_EVERYTHING; // define globally once
 
 int main()
 {
-    LOG(LOG_SUBSYSTEM_PLATFORM,   "Startup");
-    LOG(LOG_SEVERITY_TRACE|LOG_SUBSYSTEM_PLATFORM,   "Startup");
-    LOG(INFO|VIDEO,       "Video init");
-    LOG(TRACE|PLATFORM,   "Trivial info here");
-    LOG(AUDIO|ERROR|INIT, "Fatal error");
-    LOG(TRACE|AUDIO|INIT, "Trivial info here");
-    LOG(WARN|VIDEO|INIT,  "WARNING alksjdlkajskdljaskl");
-    LOG(FATAL|SHUTDOWN,   "Aborting\n");
+    LOG(TRACE|PLATFORM|INIT,"Started engine");
+    LOG(INFO|VIDEO|INIT, "Successfully initialized video subsystem");
+    LOG(AUDIO|WARN|ACTIVATE, "Insufficient memory for normal-sized buffer");
+    LOG(ERROR|NETWORK|INIT, "Couldn't init network");
+    LOG(FATAL|PLATFORM|INIT, "Fatal error occured. Aborting...");
 }
