@@ -38,7 +38,9 @@ int main()
     unsigned int buffer_size = 1024;
     LOG(AUDIO|WARN|INIT,         "Insufficient memory for buffer of size %u", buffer_size);
 
-    log_verbosity_level = LOG_WARN|LOG_ERROR|LOG_FATAL; // only log warnings or worse from here on
+    /* only log warnings or worse from here */
+    LOG_SET_MASK(WARN | ERROR | FATAL); // short form of log_verbosity_level = LOG_SEVERITY_WARN | LOG_SEVERITY_ERROR | LOG_SEVERITY_FATAL;
+
     LOG(INFO|VIDEO,              "Won't be displayed");
     LOG(FATAL|PLATFORM|SHUTDOWN, "Fatal error occured. Aborting...");
 }

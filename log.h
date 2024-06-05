@@ -154,7 +154,21 @@ enum
     {                                      \
         _LOG(flags, format, ##__VA_ARGS__) \
     }
+
+  #define LOG_SET_MASK(flags) LOG_VARIABLE_NAME = flags;
 #else
+
+  #define LOG_SET_MASK(flags)               \
+    {                                       \
+        enum {                              \
+        /* remove LOG_ prefix */            \
+        LOG_ENTRIES_SEVERITY                \
+        LOG_ENTRIES_SUBSYSTEM               \
+        LOG_ENTRIES_CATEGORY                \
+        };                                  \
+        LOG_VARIABLE_NAME = flags;         \
+    }
+
   #define LOG(flags, format, ...)           \
     {                                       \
         enum {                              \
