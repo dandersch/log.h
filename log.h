@@ -1,6 +1,11 @@
 #pragma once
 
-#undef ERROR // defined in wingdi.h as 0
+#if defined(_MSC_VER)
+  __pragma(warning(disable : 4996)) // 'localtime' is deprecated
+#endif
+#if defined (_WIN32)
+  #undef ERROR // defined in wingdi.h as 0
+#endif
 
 #if !defined(LOG_ENTRY_FILE)
 
