@@ -178,7 +178,7 @@ enum
 #undef LOG_ENTRY
 
 #define LOG_ENTRY(entry, name, value, string, color) case LOG_##entry##_##name: return color string LOG_COLOR_OFF;
-static inline const char* _log_label(int flags)
+static const char* _log_label(int flags)
 {
   switch (flags)
   {
@@ -187,7 +187,7 @@ static inline const char* _log_label(int flags)
     #else
       LOG_ENTRIES
     #endif
-    default: return "[     ]"; // TODO let user pass in
+    default: return "[     ]"; /* TODO let user pass in */
   }
 }
 #undef LOG_ENTRY

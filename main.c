@@ -1,10 +1,10 @@
 #define LOG_TIME_FORMAT LOG_COLOR_GRAY "%H:%M:%S "
 
-//#define LOG_ENTRY_FILE "log_table.h"
+/*#define LOG_ENTRY_FILE "log_table.h" */
 
-//#define LOG_USE_DEF_FILE
-//#define LOG_USE_SHORT_NAMES_GLOBALLY
-//#define LOG_ENTRY_FILE "log.def"
+/*#define LOG_USE_DEF_FILE*/
+/*#define LOG_USE_SHORT_NAMES_GLOBALLY*/
+/*#define LOG_ENTRY_FILE "log.def"*/
 
 #define LOG_ENTRIES \
 LOG_ENTRY(SEVERITY,   INFO,         (1<< 1),    "[INFO ]",     LOG_COLOR_GREEN   )\
